@@ -1,0 +1,8 @@
+{
+  "Description": "Apple Mail에서 읽지 않은 이메일 개수를 표시합니다.", 
+  "Name": "Apple Mail", 
+  "com.elgato.applemail.action": {
+    "Name": "Apple Mail", 
+    "Tooltip": "Apple Mail에서 읽지 않은 이메일 개수를 표시합니다"
+  }
+}

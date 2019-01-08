@@ -1,0 +1,37 @@
+{
+  "Actions": [
+    {
+      "Icon": "MailIcon", 
+      "Name": "Apple Mail", 
+      "States": [
+        {
+          "Image": "MailIcon",
+          "FontSize": "18", 
+          "FontStyle": "Bold", 
+          "TitleAlignment": "middle", 
+          "TitleColor": "#ffffff"
+        }
+      ], 
+      "Tooltip": "Display the number of unread emails from Apple Mail", 
+      "UUID": "com.elgato.applemail.action"
+    }
+  ], 
+  "Author": "Elgato", 
+  "CodePath": "AppleMail", 
+  "Description": "Display the number of unread emails from Apple Mail.", 
+  "Name": "Apple Mail", 
+  "Icon": "MailIcon", 
+  "URL": "https://www.elgato.com/gaming/stream-deck", 
+  "Version": "1.2",
+  "OS": [
+    {
+        "Platform": "mac", 
+        "MinimumVersion" : "10.11"
+    }
+  ],
+  "ApplicationsToMonitor": {
+  	"mac": [
+		"com.apple.mail"
+	]
+  }
+}

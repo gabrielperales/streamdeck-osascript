@@ -1,0 +1,8 @@
+{
+  "Description": "Muestra el número de correos sin leer de la aplicación Mail de Apple.", 
+  "Name": "Aplicación Mail de Apple", 
+  "com.elgato.applemail.action": {
+    "Name": "Aplicación Mail de Apple", 
+    "Tooltip": "Muestra el número de correos sin leer de la aplicación Mail de Apple"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "Description": "Display the number of unread emails from Apple Mail.", 
+  "Name": "Apple Mail", 
+  "com.elgato.applemail.action": {
+    "Name": "Apple Mail", 
+    "Tooltip": "Display the number of unread emails from Apple Mail"
+  }
+}
