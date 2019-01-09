@@ -6,12 +6,15 @@
 
 `AppleMail` is a plugin that displays the number of unread emails in Apple Mail. Pressing on the key will launch Apple Mail.
 
-Features:
+
+# Features
 
 - code written in Objective-C
 - macOS only
 - localized
 - detects if Apple Mail is running
+
+![](screenshot.png)
 
 
 # Installation
