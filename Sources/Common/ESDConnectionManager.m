@@ -221,6 +221,31 @@
 	}
 }
 
+-(void)logMessage:(NSString *)inMessage
+{
+	if([inMessage length] > 0)
+	{
+		NSDictionary *json = @{
+				   @kESDSDKCommonEvent: @kESDSDKEventLogMessage,
+				   @kESDSDKCommonPayload: @{
+				   		@kESDSDKPayloadMessage: inMessage
+					}
+				   };
+		
+		NSError *err = nil;
+		NSData *jsonData = [NSJSONSerialization dataWithJSONObject:json options:NSJSONWritingPrettyPrinted error:&err];
+		if (err == nil)
+		{
+			NSError *error = nil;
+			[self.socket sendData:jsonData error:&error];
+			if(error != nil)
+			{
+				NSLog(@"Failed to change the state due to error %@", error);
+			}
+		}
+	}
+}
+
 
 #pragma mark - WebSocket events
 

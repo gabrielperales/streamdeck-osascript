@@ -16,6 +16,7 @@
       "UUID": "com.elgato.applemail.action"
     }
   ], 
+  "SDKVersion": 2,
   "Author": "Elgato", 
   "CodePath": "AppleMail", 
   "Description": "Display the number of unread emails from Apple Mail.", 
@@ -33,5 +34,9 @@
   	"mac": [
 		"com.apple.mail"
 	]
-  }
+  },
+  "Software": 
+    {
+        "MinimumVersion" : "4.1"
+    }
 }
