@@ -73,131 +73,161 @@
 
 -(void)setTitle:(nullable NSString *)inTitle withContext:(id)inContext withTarget:(ESDSDKTarget)inTarget
 {
-	NSDictionary *json = nil;
+	if(inContext != nil)
+	{
+		NSDictionary *json = nil;
 
-	if(inTitle != NULL)
-	{
-		json = @{
-				   @kESDSDKCommonEvent: @kESDSDKEventSetTitle,
-				   @kESDSDKCommonContext: inContext,
-				   @kESDSDKCommonPayload: @{
-				   		@kESDSDKPayloadTitle: inTitle,
-					   	@kESDSDKPayloadTarget: [NSNumber numberWithInt:inTarget]
-					}
-				   };
-	}
-	else
-	{
-		json = @{
-				   @kESDSDKCommonEvent: @kESDSDKEventSetTitle,
-				   @kESDSDKCommonContext: inContext,
-				   @kESDSDKCommonPayload: @{
-					   	@kESDSDKPayloadTarget: [NSNumber numberWithInt:inTarget]
-					}
-				   };
-	}
-
-	NSError *err = nil;
-	NSData *jsonData = [NSJSONSerialization dataWithJSONObject:json options:NSJSONWritingPrettyPrinted error:&err];
-	if (err == nil)
-	{
-		NSError *error = nil;
-		[self.socket sendData:jsonData error:&error];
-		if(error != nil)
+		if(inTitle != nil)
 		{
-			NSLog(@"Failed to change the title due to error %@", error);
+			json = @{
+					   @kESDSDKCommonEvent: @kESDSDKEventSetTitle,
+					   @kESDSDKCommonContext: inContext,
+					   @kESDSDKCommonPayload: @{
+							@kESDSDKPayloadTitle: inTitle,
+							@kESDSDKPayloadTarget: [NSNumber numberWithInt:inTarget]
+						}
+					   };
+		}
+		else
+		{
+			json = @{
+					   @kESDSDKCommonEvent: @kESDSDKEventSetTitle,
+					   @kESDSDKCommonContext: inContext,
+					   @kESDSDKCommonPayload: @{
+							@kESDSDKPayloadTarget: [NSNumber numberWithInt:inTarget]
+						}
+					   };
+		}
+
+		NSError *err = nil;
+		NSData *jsonData = [NSJSONSerialization dataWithJSONObject:json options:NSJSONWritingPrettyPrinted error:&err];
+		if (err == nil)
+		{
+			NSError *error = nil;
+			[self.socket sendData:jsonData error:&error];
+			if(error != nil)
+			{
+				NSLog(@"Failed to change the title due to error %@", error);
+			}
 		}
 	}
 }
 
 -(void)setImage:(NSString*)inBase64ImageString withContext:(id)inContext withTarget:(ESDSDKTarget)inTarget
 {
-	NSDictionary *json = @{
-				   @kESDSDKCommonEvent: @kESDSDKEventSetImage,
-				   @kESDSDKCommonContext: inContext,
-				   @kESDSDKCommonPayload: @{
-				   		@kESDSDKPayloadImage: inBase64ImageString,
-					   	@kESDSDKPayloadTarget: [NSNumber numberWithInt:inTarget]
-					}
-				   };
-
-	NSError *err = nil;
-	NSData *jsonData = [NSJSONSerialization dataWithJSONObject:json options:NSJSONWritingPrettyPrinted error:&err];
-	if (err == nil)
+	if(inContext != nil)
 	{
-		NSError *error = nil;
-		[self.socket sendData:jsonData error:&error];
-		if(error != nil)
+		NSDictionary *json = nil;
+		
+		if(inBase64ImageString == nil)
 		{
-			NSLog(@"Failed to change the image due to error %@", error);
+			json = @{
+						@kESDSDKCommonEvent: @kESDSDKEventSetImage,
+						@kESDSDKCommonContext: inContext,
+						@kESDSDKCommonPayload: @{
+							@kESDSDKPayloadTarget: [NSNumber numberWithInt:inTarget]
+						}
+					};
+		}
+		else
+		{
+			json = @{
+						@kESDSDKCommonEvent: @kESDSDKEventSetImage,
+						@kESDSDKCommonContext: inContext,
+						@kESDSDKCommonPayload: @{
+							@kESDSDKPayloadImage: inBase64ImageString,
+							@kESDSDKPayloadTarget: [NSNumber numberWithInt:inTarget]
+						}
+					};
+		}
+
+		NSError *err = nil;
+		NSData *jsonData = [NSJSONSerialization dataWithJSONObject:json options:NSJSONWritingPrettyPrinted error:&err];
+		if (err == nil)
+		{
+			NSError *error = nil;
+			[self.socket sendData:jsonData error:&error];
+			if(error != nil)
+			{
+				NSLog(@"Failed to change the image due to error %@", error);
+			}
 		}
 	}
 }
 
 -(void)showAlertForContext:(id)inContext
 {
-	NSDictionary *json = @{
-				   @kESDSDKCommonEvent: @kESDSDKEventShowAlert,
-				   @kESDSDKCommonContext: inContext,
-				   };
-
-	NSError *err = nil;
-	NSData *jsonData = [NSJSONSerialization dataWithJSONObject:json options:NSJSONWritingPrettyPrinted error:&err];
-	if (err == nil)
+	if(inContext != nil)
 	{
-		NSError *error = nil;
-		[self.socket sendData:jsonData error:&error];
-		if(error != nil)
+		NSDictionary *json = @{
+					   @kESDSDKCommonEvent: @kESDSDKEventShowAlert,
+					   @kESDSDKCommonContext: inContext,
+					   };
+
+		NSError *err = nil;
+		NSData *jsonData = [NSJSONSerialization dataWithJSONObject:json options:NSJSONWritingPrettyPrinted error:&err];
+		if (err == nil)
 		{
-			NSLog(@"Failed to show the alert due to error %@", error);
+			NSError *error = nil;
+			[self.socket sendData:jsonData error:&error];
+			if(error != nil)
+			{
+				NSLog(@"Failed to show the alert due to error %@", error);
+			}
 		}
 	}
 }
 
 -(void)showOKForContext:(id)inContext
 {
-	NSDictionary *json = @{
-				   @kESDSDKCommonEvent: @kESDSDKEventShowOK,
-				   @kESDSDKCommonContext: inContext,
-				   };
-
-	NSError *err = nil;
-	NSData *jsonData = [NSJSONSerialization dataWithJSONObject:json options:NSJSONWritingPrettyPrinted error:&err];
-	if (err == nil)
+	if(inContext != nil)
 	{
-		NSError *error = nil;
-		[self.socket sendData:jsonData error:&error];
-		if(error != nil)
+		NSDictionary *json = @{
+					   @kESDSDKCommonEvent: @kESDSDKEventShowOK,
+					   @kESDSDKCommonContext: inContext,
+					   };
+
+		NSError *err = nil;
+		NSData *jsonData = [NSJSONSerialization dataWithJSONObject:json options:NSJSONWritingPrettyPrinted error:&err];
+		if (err == nil)
 		{
-			NSLog(@"Failed to show OK due to error %@", error);
+			NSError *error = nil;
+			[self.socket sendData:jsonData error:&error];
+			if(error != nil)
+			{
+				NSLog(@"Failed to show OK due to error %@", error);
+			}
 		}
 	}
 }
 
 -(void)setSettings:(NSDictionary *)inSettings forContext:(id)inContext
 {
-	NSDictionary *json = @{
-				   @kESDSDKCommonEvent: @kESDSDKEventSetSettings,
-				   @kESDSDKCommonContext: inContext,
-				   @kESDSDKCommonPayload: inSettings
-				   };
-	
-	NSError *err = nil;
-	NSData *jsonData = [NSJSONSerialization dataWithJSONObject:json options:0 error:&err];
-	if (err == nil)
+	if(inSettings != nil && inContext != nil)
 	{
-		NSError *error = nil;
-		[self.socket sendData:jsonData error:&error];
-		if(error != nil)
+		NSDictionary *json = @{
+					   @kESDSDKCommonEvent: @kESDSDKEventSetSettings,
+					   @kESDSDKCommonContext: inContext,
+					   @kESDSDKCommonPayload: inSettings
+					   };
+		
+		NSError *err = nil;
+		NSData *jsonData = [NSJSONSerialization dataWithJSONObject:json options:0 error:&err];
+		if (err == nil)
 		{
-			NSLog(@"Failed to change the settings due to error %@", error);
+			NSError *error = nil;
+			[self.socket sendData:jsonData error:&error];
+			if(error != nil)
+			{
+				NSLog(@"Failed to change the settings due to error %@", error);
+			}
 		}
 	}
 }
 
 -(void)setState:(NSNumber *)inState forContext:(id)inContext
 {
-	if(inState != NULL)
+	if(inState != nil && inContext != nil)
 	{
 		NSDictionary *json = @{
 				   @kESDSDKCommonEvent: @kESDSDKEventSetState,
