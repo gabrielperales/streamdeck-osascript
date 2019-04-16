@@ -59,7 +59,7 @@
 		
 		_devicesInfo = json[@kESDSDKDevicesInfo];
 
-		NSURLRequest *urlRequest = [[NSURLRequest alloc] initWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"ws://localhost:%d", inPort]]];
+		NSURLRequest *urlRequest = [[NSURLRequest alloc] initWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"ws://127.0.0.1:%d", inPort]]];
 		self.socket = [[SRWebSocket alloc] initWithURLRequest:urlRequest];
 		self.socket.delegate = self;
 		[self.socket open];
