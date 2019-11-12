@@ -1,8 +1,8 @@
 {
-  "Description": "Zeigt die Anzahl ungelesener E-Mails von Apple Mail an.", 
+  "Description": "Sieh, wie viele ungelesene E-Mails du hast.", 
   "Name": "Apple Mail", 
   "com.elgato.applemail.action": {
     "Name": "Apple Mail", 
-    "Tooltip": "Zeigt die Anzahl ungelesener E-Mails von Apple Mail an"
+    "Tooltip": "Sieh, wie viele ungelesene E-Mails du hast"
   }
 }

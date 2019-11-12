@@ -1,8 +1,8 @@
 {
-  "Description": "Appleの“メール”の未開封のメール数を表示します。", 
+  "Description": "未読のメール件数を表示。", 
   "Name": "Appleの“メール”", 
   "com.elgato.applemail.action": {
     "Name": "Appleの“メール”", 
-    "Tooltip": "Appleの“メール”の未開封のメール数を表示します"
+    "Tooltip": "未読のメール件数を表示。"
   }
 }
