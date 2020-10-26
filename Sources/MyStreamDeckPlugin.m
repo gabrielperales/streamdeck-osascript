@@ -205,7 +205,7 @@ static NSString * CreateBase64EncodedString(NSString *inImagePath)
 	}
 	
 	// Execute the NumberOfUnreadMails.scpt Applescript tp retrieve the number of unread emails
-	int numberOfUnreadEmails = 0;
+	int numberOfUnreadEmails = -1;
 	NSURL* url = [NSURL fileURLWithPath:GetResourcePath(@"NumberOfUnreadMails.scpt")];
 	
 	NSDictionary *errors = nil;
@@ -222,14 +222,20 @@ static NSString * CreateBase64EncodedString(NSString *inImagePath)
 	// Update each known context with the new value
 	for(NSString *context in self.knownContexts)
 	{
-		if(numberOfUnreadEmails >= 0)
+		if(numberOfUnreadEmails > 0)
 		{
 			[self.connectionManager setImage:self.base64MailBadgeIconString withContext:context withTarget:kESDSDKTarget_HardwareAndSoftware];
 			[self.connectionManager setTitle:[NSString stringWithFormat:@"%d", numberOfUnreadEmails] withContext:context withTarget:kESDSDKTarget_HardwareAndSoftware];
 		}
+		else if(numberOfUnreadEmails == 0)
+		{
+			[self.connectionManager setImage:self.base64MailIconString withContext:context withTarget:kESDSDKTarget_HardwareAndSoftware];
+			[self.connectionManager setTitle:nil withContext:context withTarget:kESDSDKTarget_HardwareAndSoftware];
+		}
 		else
 		{
 			[self.connectionManager setImage:self.base64MailIconString withContext:context withTarget:kESDSDKTarget_HardwareAndSoftware];
+			[self.connectionManager setTitle:nil withContext:context withTarget:kESDSDKTarget_HardwareAndSoftware];
 			[self.connectionManager showAlertForContext:context];
 		}
 	}
