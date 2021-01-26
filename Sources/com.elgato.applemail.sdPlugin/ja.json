@@ -1,8 +1,0 @@
-{
-  "Description": "未読のメール件数を表示。", 
-  "Name": "Appleの“メール”", 
-  "com.elgato.applemail.action": {
-    "Name": "Appleの“メール”", 
-    "Tooltip": "未読のメール件数を表示。"
-  }
-}

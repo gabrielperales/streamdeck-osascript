@@ -1,8 +1,0 @@
-{
-  "Description": "显示您有多少未读邮件。", 
-  "Name": "Apple“邮件”", 
-  "com.elgato.applemail.action": {
-    "Name": "Apple“邮件”", 
-    "Tooltip": "显示您有多少未读邮件"
-  }
-}

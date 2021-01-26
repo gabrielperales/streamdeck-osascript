@@ -10,16 +10,13 @@
 **/
 //==============================================================================
 
+@import OSAKit;
 #import "MyStreamDeckPlugin.h"
 
 #import "ESDSDKDefines.h"
 #import "ESDConnectionManager.h"
 #import "ESDUtilities.h"
 #import <AppKit/AppKit.h>
-
-
-// Refresh the unread count every 60s
-#define REFRESH_UNREAD_COUNT_TIME_INTERVAL		60.0
 
 
 // Size of the images
@@ -145,20 +142,13 @@ static NSString * CreateBase64EncodedString(NSString *inImagePath)
 
 @interface MyStreamDeckPlugin ()
 
-// Tells us if Apple Mail is running
-@property (assign) BOOL isAppleMailRunning;
-
-// A timer fired each minute to update the number of unread email from Apple's Mail
-@property (strong) NSTimer *refreshTimer;
-
 // The list of visible contexts
 @property (strong) NSMutableArray *knownContexts;
 
 // The Mail icon encoded in base64
 @property (strong) NSString *base64MailIconString;
 
-// The Mail icon with a badge encoded in base64
-@property (strong) NSString *base64MailBadgeIconString;
+@property (strong) NSMutableDictionary * settingsPayload;
 
 @end
 
@@ -176,86 +166,48 @@ static NSString * CreateBase64EncodedString(NSString *inImagePath)
 	{
 		_knownContexts = [[NSMutableArray alloc] init];
 	}
-	
-	// Create a timer to repetivily update the actions
-	if(_refreshTimer == nil)
-	{
-		_refreshTimer = [NSTimer scheduledTimerWithTimeInterval:REFRESH_UNREAD_COUNT_TIME_INTERVAL target:self selector:@selector(refreshUnreadCount) userInfo:nil repeats:YES];
-	}
+    
+    if(_settingsPayload == nil){
+        _settingsPayload = [[NSMutableDictionary alloc] init];
+    }
 	
 	if(_base64MailIconString == nil)
 	{
-		_base64MailIconString = CreateBase64EncodedString(GetResourcePath(@"MailIcon.png"));
-	}
-	
-	if(_base64MailBadgeIconString == nil)
-	{
-		_base64MailBadgeIconString = CreateBase64EncodedString(GetResourcePath(@"MailBadgeIcon.png"));
-	}
-}
-
-
-// MARK: - Refresh all actions
-
-- (void)refreshUnreadCount
-{
-	if(!self.isAppleMailRunning)
-	{
-		return;
-	}
-	
-	// Execute the NumberOfUnreadMails.scpt Applescript tp retrieve the number of unread emails
-	int numberOfUnreadEmails = -1;
-	NSURL* url = [NSURL fileURLWithPath:GetResourcePath(@"NumberOfUnreadMails.scpt")];
-	
-	NSDictionary *errors = nil;
-	NSAppleScript* appleScript = [[NSAppleScript alloc] initWithContentsOfURL:url error:&errors];
-	if(appleScript != nil)
-	{
-		NSAppleEventDescriptor *eventDescriptor = [appleScript executeAndReturnError:&errors];
-		if(eventDescriptor != nil && [eventDescriptor descriptorType] != kAENullEvent)
-		{
-			numberOfUnreadEmails = (int)[eventDescriptor int32Value];
-		}
-	}
-	
-	// Update each known context with the new value
-	for(NSString *context in self.knownContexts)
-	{
-		if(numberOfUnreadEmails > 0)
-		{
-			[self.connectionManager setImage:self.base64MailBadgeIconString withContext:context withTarget:kESDSDKTarget_HardwareAndSoftware];
-			[self.connectionManager setTitle:[NSString stringWithFormat:@"%d", numberOfUnreadEmails] withContext:context withTarget:kESDSDKTarget_HardwareAndSoftware];
-		}
-		else if(numberOfUnreadEmails == 0)
-		{
-			[self.connectionManager setImage:self.base64MailIconString withContext:context withTarget:kESDSDKTarget_HardwareAndSoftware];
-			[self.connectionManager setTitle:nil withContext:context withTarget:kESDSDKTarget_HardwareAndSoftware];
-		}
-		else
-		{
-			[self.connectionManager setImage:self.base64MailIconString withContext:context withTarget:kESDSDKTarget_HardwareAndSoftware];
-			[self.connectionManager setTitle:nil withContext:context withTarget:kESDSDKTarget_HardwareAndSoftware];
-			[self.connectionManager showAlertForContext:context];
-		}
+		_base64MailIconString = CreateBase64EncodedString(GetResourcePath(@"RunOSAScripticon.png"));
 	}
 }
 
 
 // MARK: - Events handler
 
-
 - (void)keyDownForAction:(NSString *)action withContext:(id)context withPayload:(NSDictionary *)payload forDevice:(NSString *)deviceID
 {
-	// On key press, open the Mail.app application
-	NSURL* url = [NSURL fileURLWithPath:GetResourcePath(@"OpenMail.scpt")];
-	
-	NSDictionary *errors = nil;
-	NSAppleScript* appleScript = [[NSAppleScript alloc] initWithContentsOfURL:url error:&errors];
-	if(appleScript != nil)
-	{
-		[appleScript executeAndReturnError:&errors];
-	}
+    OSAScript * osa;     // empty osa object
+    NSDictionary * errors = nil;     //errors
+
+    NSDictionary * tempDict = self.settingsPayload[context]; //grab 'our' copy of the settings (for this specific context/button)
+
+    ///  * language - A string containing the OSA language, either 'AppleScript' or 'JavaScript'.
+    NSString * language = tempDict[@"language"];
+    
+    if(tempDict[@"scriptText"] != nil)
+    {
+        //Handler for inline scripts
+        NSString * tempSource= tempDict[@"scriptText"];
+        if(tempSource != nil){
+            osa = [[OSAScript alloc] initWithSource:tempSource language: [OSALanguage languageForName:language]];
+        }
+    }
+
+    // Run it!
+    if(osa != nil)
+    {
+        [osa executeAndReturnError:&errors];
+
+        if (errors) {
+            NSLog(@"errors: %@", errors);
+        }
+    }
 }
 
 - (void)keyUpForAction:(NSString *)action withContext:(id)context withPayload:(NSDictionary *)payload forDevice:(NSString *)deviceID
@@ -268,11 +220,16 @@ static NSString * CreateBase64EncodedString(NSString *inImagePath)
 	// Set up the instance variables if needed
 	[self setupIfNeeded];
 	
+    NSLog(@"willAppear: %@", payload);
+
+    //create a temp dictionary with the "context" for this 'fake instance' with contents of settings from App
+    NSDictionary * tempSettings = @{context: payload[@"settings"]};
+
+    //add that temp dictionary to our internal not-a-database
+    [self.settingsPayload addEntriesFromDictionary:tempSettings];
+    
 	// Add the context to the list of known contexts
 	[self.knownContexts addObject:context];
-	
-	// Explicitely refresh the number of unread emails
-	[self refreshUnreadCount];
 }
 
 - (void)willDisappearForAction:(NSString *)action withContext:(id)context withPayload:(NSDictionary *)payload forDevice:(NSString *)deviceID
@@ -293,21 +250,12 @@ static NSString * CreateBase64EncodedString(NSString *inImagePath)
 
 - (void)applicationDidLaunch:(NSDictionary *)applicationInfo
 {
-	if([applicationInfo[@kESDSDKPayloadApplication] isEqualToString:@"com.apple.mail"])
-	{
-		self.isAppleMailRunning = YES;
-		
-		// Explicitely refresh the number of unread emails
-		[self refreshUnreadCount];
-	}
+    // Nothing to do
 }
 
 - (void)applicationDidTerminate:(NSDictionary *)applicationInfo
 {
-	if([applicationInfo[@kESDSDKPayloadApplication] isEqualToString:@"com.apple.mail"])
-	{
-		self.isAppleMailRunning = NO;
-	}
+    // Nothing to do
 }
 
 @end

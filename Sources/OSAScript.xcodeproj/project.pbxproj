@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7F1EB5A225BC226A00EBFAC7 /* OSAKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F1EB5A125BC226A00EBFAC7 /* OSAKit.framework */; };
 		FA29E473215E7D2300C9F60C /* ESDConnectionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = FA29E46E215E7D2300C9F60C /* ESDConnectionManager.m */; };
 		FA29E474215E7D2300C9F60C /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = FA29E46F215E7D2300C9F60C /* main.m */; };
 		FA80591421623A0D00ED7E12 /* ESDUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = FA80591321623A0D00ED7E12 /* ESDUtilities.m */; };
@@ -38,7 +39,7 @@
 		FA0F7B752105CBC30028CF34 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = /usr/share/man/man1/;
+			dstPath = /usr/share/man/man1;
 			dstSubfolderSpec = 0;
 			files = (
 			);
@@ -47,7 +48,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		FA0F7B772105CBC30028CF34 /* AppleMail */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = AppleMail; sourceTree = BUILT_PRODUCTS_DIR; };
+		7F1EB5A125BC226A00EBFAC7 /* OSAKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OSAKit.framework; path = System/Library/Frameworks/OSAKit.framework; sourceTree = SDKROOT; };
+		FA0F7B772105CBC30028CF34 /* OSAScript */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = OSAScript; sourceTree = BUILT_PRODUCTS_DIR; };
 		FA29E46E215E7D2300C9F60C /* ESDConnectionManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ESDConnectionManager.m; sourceTree = "<group>"; };
 		FA29E46F215E7D2300C9F60C /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		FA29E470215E7D2300C9F60C /* ESDConnectionManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ESDConnectionManager.h; sourceTree = "<group>"; };
@@ -109,6 +111,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FA80591921623C9200ED7E12 /* AppKit.framework in Frameworks */,
+				7F1EB5A225BC226A00EBFAC7 /* OSAKit.framework in Frameworks */,
 				FA80591721623C8D00ED7E12 /* CoreFoundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -131,7 +134,7 @@
 		FA0F7B782105CBC30028CF34 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				FA0F7B772105CBC30028CF34 /* AppleMail */,
+				FA0F7B772105CBC30028CF34 /* OSAScript */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -153,6 +156,7 @@
 		FA80591521623C8D00ED7E12 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				7F1EB5A125BC226A00EBFAC7 /* OSAKit.framework */,
 				FA80591821623C9200ED7E12 /* AppKit.framework */,
 				FA80591621623C8D00ED7E12 /* CoreFoundation.framework */,
 			);
@@ -276,9 +280,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		FA0F7B762105CBC30028CF34 /* AppleMail */ = {
+		FA0F7B762105CBC30028CF34 /* OSAScript */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = FA0F7B7E2105CBC30028CF34 /* Build configuration list for PBXNativeTarget "AppleMail" */;
+			buildConfigurationList = FA0F7B7E2105CBC30028CF34 /* Build configuration list for PBXNativeTarget "OSAScript" */;
 			buildPhases = (
 				FA0F7B732105CBC30028CF34 /* Sources */,
 				FA0F7B742105CBC30028CF34 /* Frameworks */,
@@ -288,9 +292,9 @@
 			);
 			dependencies = (
 			);
-			name = AppleMail;
+			name = OSAScript;
 			productName = ObjcPlugin;
-			productReference = FA0F7B772105CBC30028CF34 /* AppleMail */;
+			productReference = FA0F7B772105CBC30028CF34 /* OSAScript */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
@@ -307,7 +311,7 @@
 					};
 				};
 			};
-			buildConfigurationList = FA0F7B722105CBC30028CF34 /* Build configuration list for PBXProject "AppleMail" */;
+			buildConfigurationList = FA0F7B722105CBC30028CF34 /* Build configuration list for PBXProject "OSAScript" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -319,7 +323,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				FA0F7B762105CBC30028CF34 /* AppleMail */,
+				FA0F7B762105CBC30028CF34 /* OSAScript */,
 			);
 		};
 /* End PBXProject section */
@@ -475,7 +479,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				PRODUCT_BUNDLE_IDENTIFIER = com.elgato.applemail;
+				PRODUCT_BUNDLE_IDENTIFIER = com.gabrielperales.osascript;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -484,7 +488,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				PRODUCT_BUNDLE_IDENTIFIER = com.elgato.applemail;
+				PRODUCT_BUNDLE_IDENTIFIER = com.gabrielperales.runosascript;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -492,7 +496,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		FA0F7B722105CBC30028CF34 /* Build configuration list for PBXProject "AppleMail" */ = {
+		FA0F7B722105CBC30028CF34 /* Build configuration list for PBXProject "OSAScript" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				FA0F7B7C2105CBC30028CF34 /* Debug */,
@@ -501,7 +505,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		FA0F7B7E2105CBC30028CF34 /* Build configuration list for PBXNativeTarget "AppleMail" */ = {
+		FA0F7B7E2105CBC30028CF34 /* Build configuration list for PBXNativeTarget "OSAScript" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				FA0F7B7F2105CBC30028CF34 /* Debug */,

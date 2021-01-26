@@ -1,8 +1,0 @@
-{
-  "Description": "Consultez le nombre d’e-mails non lus.", 
-  "Name": "Apple Mail", 
-  "com.elgato.applemail.action": {
-    "Name": "Apple Mail", 
-    "Tooltip": "Consultez le nombre d’e-mails non lus"
-  }
-}

@@ -1,8 +1,0 @@
-{
-  "Description": "Averigua cuántos correos tienes sin leer.", 
-  "Name": "Aplicación Mail de Apple", 
-  "com.elgato.applemail.action": {
-    "Name": "Aplicación Mail de Apple", 
-    "Tooltip": "Averigua cuántos correos tienes sin leer"
-  }
-}

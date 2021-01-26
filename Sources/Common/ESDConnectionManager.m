@@ -225,6 +225,31 @@
 	}
 }
 
+-(void)sendToPropertyInspector:(NSDictionary*)inPayload withContext:(id)inContext
+{
+    NSDictionary *json = nil;
+    json = @{
+              @kESDSDKCommonEvent: @kESDSDKEventSendToPropertyInspector,
+              @kESDSDKCommonContext: inContext,
+              @kESDSDKCommonPayload: inPayload
+              };
+    
+    NSError *err = nil;
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:json options:NSJSONWritingPrettyPrinted error:&err];
+    if (err == nil)
+    {
+        NSError *error = nil;
+        [self.socket sendData:jsonData error:&error];
+        if(error != nil)
+        {
+            NSLog(@"Failed to update the Property Inspector due to error %@", error);
+        }
+        if(error == nil)
+        {
+        }
+    }
+}
+
 -(void)setState:(NSNumber *)inState forContext:(id)inContext
 {
 	if(inState != nil && inContext != nil)
