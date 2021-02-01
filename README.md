@@ -15,7 +15,7 @@
 
 ## Installation
 
-In the Release folder, you can find the file `com.elgato.applemail.streamDeckPlugin`. If you double-click this file on your machine, Stream Deck will install the plugin.
+In the Release folder, you can find the file `com.gabrielperales.osascript.streamDeckPlugin`. If you double-click this file on your machine, Stream Deck will install the plugin.
 
 ## Source code
 
