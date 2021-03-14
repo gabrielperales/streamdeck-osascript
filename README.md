@@ -22,42 +22,13 @@ In the Release folder, you can find the file `com.gabrielperales.osascript.strea
 The Sources folder contains the source code of the plugin.
 
 
-## Recipes
+## Examples
 
-### Set VS Code half screen - left
-
-```JavaScript
-var code = Application('Visual Studio Code');
-var finder = Application('Finder');
-var desktop = finder.desktop.window();
-var desktopSize = desktop.bounds();
-
-code.activate();
-
-code.windows[0].bounds = {
-	x: 0,
-	y: 0,
-	width: desktopSize.width / 2,
-	height: desktopSize.height /2,
-};
-```
-
-### Set VS Code fullscreen
+### Open VS Code
 
 ```JavaScript
 var code = Application('Visual Studio Code');
-var finder = Application('Finder');
-var desktop = finder.desktop.window();
-var desktopSize = desktop.bounds();
-
 code.activate();
-
-code.windows[0].bounds = {
-	x: 0,
-	y: 0,
-	width: desktopSize.width,
-	height: desktopSize.height,
-};
 ```
 
 ## Resources to learn AppleScript and JXA
