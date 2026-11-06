@@ -1,5 +1,9 @@
 # streamdeck-osascript
 
+[![Build](https://github.com/gabrielperales/streamdeck-osascript/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/gabrielperales/streamdeck-osascript/actions/workflows/build.yml?query=branch%3Amaster)
+[![Latest release](https://img.shields.io/github/v/release/gabrielperales/streamdeck-osascript)](https://github.com/gabrielperales/streamdeck-osascript/releases/latest)
+[![License: MIT](https://img.shields.io/github/license/gabrielperales/streamdeck-osascript)](LICENSE)
+
 Run AppleScript and JavaScript for Automation (JXA) from a Stream Deck key.
 
 ![Property Inspector of the OSA Script action](screenshot.png)
