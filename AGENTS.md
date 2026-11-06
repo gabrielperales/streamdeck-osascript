@@ -9,7 +9,7 @@ macOS Stream Deck plugin (SDK v2, Objective-C) that runs a per-key AppleScript o
 - `Sources/Common/`: Elgato SDK boilerplate (`ESDConnectionManager` dispatches WebSocket events to the plugin).
 - `Sources/Vendor/SocketRocket/`: third-party code. Treat as read-only.
 - `.github/workflows/test.yml`: reusable workflow (`workflow_call`) that runs `make test`. It has no push or PR trigger of its own, so the tests run once per event.
-- `.github/workflows/build.yml`: runs on pull requests, pushes to `master` and `v*` tags. Its `build` job `needs` the Tests workflow, then runs `make package`. On a `v*` tag it also publishes the package as a GitHub release. Keep that `needs: test` dependency and the `Makefile` chain `test` → `build` → `stage` → `validate` → `package`: nothing is packaged without passing the tests and Elgato's validation.
+- `.github/workflows/build.yml`: runs on pull requests, pushes to `master` and `v*` tags. Its `build` job `needs` the Tests workflow, then runs `make build`, `make stage`, `make validate` and `make pack` as separate steps. On a `v*` tag it also publishes the package as a GitHub release. Keep that `needs: test` dependency, and keep the step order in both places: the `package` target in the `Makefile` and the steps in `build.yml`. Nothing should be packed without passing the tests and Elgato's validation.
 
 ## Settings contract
 
@@ -24,7 +24,7 @@ The plugin caches settings in `settingsPayload`, keyed by action context, and fi
 
 ## Building and verifying
 
-- `make package` (needs Xcode and Node.js 20+) builds the `RunOSAScript` scheme as a universal arm64/x86_64 binary, stages it with the `.sdPlugin` folder in `build/stage/`, then runs Elgato's `streamdeck validate` and `streamdeck pack` (CLI version pinned as `STREAMDECK_CLI_VERSION` in the `Makefile`) into `build/release/com.gabrielperales.osascript.streamDeckPlugin`. Change build flags there, not only in the workflow, so local and CI builds match.
+- The `Makefile` has one target per step: `test`, `build` (the `RunOSAScript` scheme as a universal arm64/x86_64 binary, needs Xcode), `stage` (`.sdPlugin` folder + binary into `build/stage/`), `validate` and `pack` (Elgato's `streamdeck validate` and `streamdeck pack`, need Node.js 20+; the CLI version is pinned as `STREAMDECK_CLI_VERSION`). `make package` runs them in order and writes `build/release/com.gabrielperales.osascript.streamDeckPlugin`. Change build flags in the `Makefile`, not in the workflow, so local and CI builds match.
 - Run `make test` after changing plugin logic. It compiles `Tests/MyStreamDeckPluginTests.m` with the plugin sources using plain `clang` (Command Line Tools are enough) and drives `MyStreamDeckPlugin` through its event methods; scripts prove they ran by writing a marker file. Add a test function to `Tests/MyStreamDeckPluginTests.m` and list it in `main()`. If you add a source file the plugin depends on, add it to `TEST_SOURCES` in the `Makefile`.
 - The tests do not cover the WebSocket layer (`ESDConnectionManager`) or the Property Inspector. For those, install the plugin in the Stream Deck app and press a key; script errors go to the unified log via `NSLog` (filter Console.app by `OSAScript`).
 - The `OSAScript` binary and the `.streamDeckPlugin` package are never committed (both are in `.gitignore`). A source change ships when a `v*` tag is pushed.
