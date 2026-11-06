@@ -1,6 +1,7 @@
 # `make test` builds and runs the plugin tests with clang (Command Line Tools
-# are enough). `make package` needs Xcode: it builds a universal OSAScript
-# binary and zips it with the .sdPlugin folder into build/release/.
+# are enough). `make package` needs Xcode: it runs the tests, builds a
+# universal OSAScript binary and zips it with the .sdPlugin folder into
+# build/release/. `build` depends on `test`, so a failing test stops the build.
 
 BUILD_DIR := build/tests
 CFLAGS := -fobjc-arc -fmodules -Wall -Wno-deprecated-declarations \
@@ -26,7 +27,7 @@ $(BUILD_DIR)/PluginTests: $(TEST_SOURCES) Sources/MyStreamDeckPlugin.h
 	@mkdir -p $(BUILD_DIR)
 	clang $(CFLAGS) $(TEST_SOURCES) $(FRAMEWORKS) -o $@
 
-build:
+build: test
 	xcodebuild -project Sources/OSAScript.xcodeproj -scheme RunOSAScript \
 	  -configuration Release -derivedDataPath $(XCODE_DIR) \
 	  ARCHS="arm64 x86_64" ONLY_ACTIVE_ARCH=NO \

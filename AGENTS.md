@@ -8,7 +8,8 @@ macOS Stream Deck plugin (SDK v2, Objective-C) that runs a per-key AppleScript o
 - `Sources/com.gabrielperales.osascript.sdPlugin/`: the bundle Stream Deck loads. `index.html` is the Property Inspector; `manifest.json` declares the action UUID `com.gabrielperales.osascript.action`.
 - `Sources/Common/`: Elgato SDK boilerplate (`ESDConnectionManager` dispatches WebSocket events to the plugin).
 - `Sources/Vendor/SocketRocket/`: third-party code. Treat as read-only.
-- `.github/workflows/build.yml`: CI. Runs `make test` and `make package` on macOS; on a `v*` tag it publishes the package as a GitHub release.
+- `.github/workflows/test.yml`: runs `make test` on pull requests. It is also a reusable workflow (`workflow_call`).
+- `.github/workflows/build.yml`: runs on pushes to `master` and on `v*` tags. Its `build` job `needs` the reusable Tests workflow, then runs `make package`. On a `v*` tag it also publishes the package as a GitHub release. Keep that `needs: test` dependency, and keep `build: test` in the `Makefile`: no build should happen without the tests passing first.
 
 ## Settings contract
 
