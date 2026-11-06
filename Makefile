@@ -2,7 +2,8 @@
 #   test      build and run the plugin tests with clang (Command Line Tools are enough)
 #   build     build a universal OSAScript binary with xcodebuild (needs Xcode)
 #   stage     copy the .sdPlugin folder and the binary into build/stage/
-#   validate  run Elgato's `streamdeck validate` on the staged plugin (needs Node.js 20+)
+#   validate  check manifest icons (Tests/check_manifest.py), then run Elgato's
+#             `streamdeck validate` on the staged plugin (needs Node.js 20+)
 #   pack      run `streamdeck pack` into build/release/
 #   e2e       unpack the package and drive the real binary with a fake Stream Deck
 #             (Tests/fake_streamdeck.py), once per architecture in E2E_ARCHS
@@ -54,6 +55,7 @@ stage:
 
 validate:
 	@test -d $(STAGE_DIR)/$(PLUGIN).sdPlugin || { echo "Nothing staged: run 'make stage' first"; exit 1; }
+	python3 Tests/check_manifest.py $(STAGE_DIR)/$(PLUGIN).sdPlugin
 	$(STREAMDECK) validate $(STAGE_DIR)/$(PLUGIN).sdPlugin --no-update-check
 
 pack:
