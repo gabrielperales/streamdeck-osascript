@@ -4,7 +4,7 @@ All notable changes to this plugin are documented here. The format is based on [
 
 ## [Unreleased]
 
-## [1.1.0] - 2026-11-06
+## [1.1.0] - 2026-11-07
 
 ### Added
 
@@ -21,10 +21,12 @@ All notable changes to this plugin are documented here. The format is based on [
 ### Fixed
 
 - Script edits in the Property Inspector apply on the next key press. Before, they only took effect after the key reappeared (changing page or profile, or restarting Stream Deck).
+- The plugin no longer crashes when Stream Deck sends a key without a settings dictionary.
 
 ### Removed
 
 - The prebuilt plugin is no longer stored in the repository under `Release/`.
+- The "Show a notification" example from the README: macOS does not show notifications posted from the plugin process.
 
 ## [1.0.0] - 2021-01-26
 

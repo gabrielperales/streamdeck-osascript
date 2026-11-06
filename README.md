@@ -10,7 +10,9 @@ Run AppleScript and JavaScript for Automation (JXA) from a Stream Deck key.
 
 - Runs **AppleScript** or **JXA** (JavaScript for Automation) on key press
 - Scripts are written inline in the Property Inspector, one per key
+- Edits in the Property Inspector apply on the next key press
 - Native Objective-C plugin using `OSAKit`, so there is no `osascript` subprocess
+- Universal binary: runs natively on Apple silicon and Intel Macs
 
 ## Requirements
 
@@ -28,10 +30,7 @@ Run AppleScript and JavaScript for Automation (JXA) from a Stream Deck key.
 1. Select the key to open its Property Inspector.
 2. Pick the **Script Language**: `AppleScript` or `JavaScript`.
 3. Paste your script into **Script (Inline)**. It is saved as you type.
-4. Press the key.
-
-> [!NOTE]
-> The plugin reads a key's script when the key appears on the Stream Deck. After editing a script, switch to another page or profile and back (or restart the Stream Deck app) before pressing the key.
+4. Press the key. It runs the script as currently saved; there is no need to switch pages or restart Stream Deck after editing.
 
 The first time a script controls another app, macOS asks for permission. You can review it later under **System Settings → Privacy & Security → Automation** (and **Accessibility** for scripts that use `System Events` to click or type).
 
@@ -60,18 +59,25 @@ end tell
 tell application "Music" to playpause
 ```
 
-### Show a notification (JXA)
+### Speak text (AppleScript)
+
+```applescript
+say "Hello from Stream Deck"
+```
+
+### Open a web page in the default browser (JXA)
 
 ```javascript
 var app = Application.currentApplication();
 app.includeStandardAdditions = true;
-app.displayNotification('Hello from Stream Deck', { withTitle: 'OSA Script' });
+app.openLocation('https://github.com/gabrielperales/streamdeck-osascript');
 ```
 
 ## Troubleshooting
 
 - **Nothing happens when I press the key.** Test the script in Script Editor (or with `osascript` in Terminal) first. Script errors are written to the macOS log; open Console.app and filter by `OSAScript`.
-- **My edits are ignored.** See the note in [Usage](#usage): the key has to reappear before the new script is picked up.
+- **My edits are ignored.** Update to version 1.1.0 or later. Earlier versions only picked up an edited script after the key reappeared (changing page or profile, or restarting the Stream Deck app).
+- **`display notification` shows nothing.** macOS does not show notifications posted from the plugin process, so `display notification` (AppleScript) and `displayNotification` (JXA) do nothing when run from a key. Use another visible action instead, such as `say`, or open an app or URL.
 - **"Not authorized to send Apple events".** Grant permission under **Privacy & Security → Automation**.
 
 ## Building from source
@@ -93,7 +99,9 @@ make test      # unit tests (Command Line Tools are enough)
 make package   # test, build, stage, validate, pack and e2e, in that order
 ```
 
-`make e2e` tests the packaged plugin without a Stream Deck: `Tests/fake_streamdeck.py` plays the Stream Deck app, launches the real binary (arm64 and x86_64) and presses keys configured with AppleScript and JXA scripts.
+`make e2e` tests the packaged plugin without a Stream Deck: `Tests/fake_streamdeck.py` plays the Stream Deck app, launches the real binary (arm64 and x86_64), presses keys configured with AppleScript and JXA scripts, and checks that a script edited in the Property Inspector runs on the next press. Nothing automated covers the Property Inspector UI (`index.html`); test that in the Stream Deck app.
+
+`make validate` runs `Tests/check_manifest.py` before Elgato's validator. It catches manifest problems the Stream Deck app rejects on install but `streamdeck validate` misses, such as a `Category` without a `CategoryIcon`.
 
 Each step is also its own target (`make build`, `make stage`, `make validate`, `make pack`, `make e2e`). `make package` stops at the first failing step. The package is written to `build/release/com.gabrielperales.osascript.streamDeckPlugin`.
 
