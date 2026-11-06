@@ -14,12 +14,12 @@ Run AppleScript and JavaScript for Automation (JXA) from a Stream Deck key.
 
 ## Requirements
 
-- macOS 10.11 or later
+- macOS 10.13 or later
 - Stream Deck software 4.1 or later
 
 ## Installation
 
-1. Download [`Release/com.gabrielperales.osascript.streamDeckPlugin`](Release/com.gabrielperales.osascript.streamDeckPlugin).
+1. Download `com.gabrielperales.osascript.streamDeckPlugin` from the [latest release](https://github.com/gabrielperales/streamdeck-osascript/releases/latest).
 2. Double-click it. The Stream Deck app installs the plugin.
 3. Drag the **Run OSA script** action (category **OSA Script**) onto a key.
 
@@ -84,13 +84,16 @@ The plugin source lives in [`Sources/`](Sources/):
 | `Sources/MyStreamDeckPlugin.m` | Plugin logic: stores settings per key and runs the script on key down |
 | `Sources/Common/` | Elgato SDK connection boilerplate |
 | `Sources/Vendor/SocketRocket/` | Vendored WebSocket library |
-| `Sources/com.gabrielperales.osascript.sdPlugin/` | Plugin bundle: `manifest.json`, Property Inspector (`index.html`), icons, and the compiled `OSAScript` binary |
+| `Sources/com.gabrielperales.osascript.sdPlugin/` | Plugin bundle: `manifest.json`, Property Inspector (`index.html`) and icons. The `OSAScript` binary is added at build time |
 
-To build and package:
+To build and package (requires Xcode):
 
-1. Open `Sources/OSAScript.xcodeproj` in Xcode and build the `RunOSAScript` scheme.
-2. Copy the built `OSAScript` executable into `Sources/com.gabrielperales.osascript.sdPlugin/`.
-3. Package the `.sdPlugin` folder with Elgato's packaging tool (the [Stream Deck CLI](https://docs.elgato.com/streamdeck/cli/intro) `streamdeck pack` command, or the older `DistributionTool`) and place the resulting `.streamDeckPlugin` in `Release/`.
+```sh
+make test      # unit tests (Command Line Tools are enough)
+make package   # universal binary + build/release/com.gabrielperales.osascript.streamDeckPlugin
+```
+
+GitHub Actions (`.github/workflows/build.yml`) runs the same steps on every push and pull request and uploads the package as a workflow artifact. To publish a release, bump `Version` in `manifest.json`, then push a matching tag (for example `v1.1.0`); the workflow attaches the package to a GitHub release.
 
 ## Resources to learn AppleScript and JXA
 

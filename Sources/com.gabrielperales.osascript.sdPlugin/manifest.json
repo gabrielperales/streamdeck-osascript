@@ -24,11 +24,11 @@
   "URL": "https://github.com/gabrielperales/streamdeck-osascript",
   "Name": "OSA Script",
   "Icon": "OSAScriptIcon",
-  "Version": "1.0.0",
+  "Version": "1.1.0",
   "OS": [
     {
         "Platform": "mac",
-        "MinimumVersion" : "10.11"
+        "MinimumVersion" : "10.13"
     }
   ],
   "Software":

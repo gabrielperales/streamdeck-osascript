@@ -8,7 +8,7 @@ macOS Stream Deck plugin (SDK v2, Objective-C) that runs a per-key AppleScript o
 - `Sources/com.gabrielperales.osascript.sdPlugin/`: the bundle Stream Deck loads. `index.html` is the Property Inspector; `manifest.json` declares the action UUID `com.gabrielperales.osascript.action`.
 - `Sources/Common/`: Elgato SDK boilerplate (`ESDConnectionManager` dispatches WebSocket events to the plugin).
 - `Sources/Vendor/SocketRocket/`: third-party code. Treat as read-only.
-- `Release/*.streamDeckPlugin`: a zip of the `.sdPlugin` folder, committed as the user-facing download.
+- `.github/workflows/build.yml`: CI. Runs `make test` and `make package` on macOS; on a `v*` tag it publishes the package as a GitHub release.
 
 ## Settings contract
 
@@ -23,13 +23,14 @@ The plugin caches settings in `settingsPayload`, keyed by action context, and fi
 
 ## Building and verifying
 
-- Build with Xcode, scheme `RunOSAScript` in `Sources/OSAScript.xcodeproj`. CLI: `xcodebuild -project Sources/OSAScript.xcodeproj -scheme RunOSAScript -configuration Release build`.
-- There are no automated tests. Verify behaviour by installing the plugin in the Stream Deck app and pressing a key; script errors go to the unified log via `NSLog` (filter Console.app by `OSAScript`).
-- The committed `OSAScript` binary and the `Release/` package are build outputs that are updated by hand. A source change is not shipped until the binary is copied into the `.sdPlugin` folder and the package is regenerated; say so when you change `.m`/`.h` files without doing it. The committed binary is x86_64 only.
+- `make package` (needs Xcode) builds the `RunOSAScript` scheme as a universal arm64/x86_64 binary and zips it with the `.sdPlugin` folder into `build/release/com.gabrielperales.osascript.streamDeckPlugin`. Change build flags there, not only in the workflow, so local and CI builds match.
+- Run `make test` after changing plugin logic. It compiles `Tests/MyStreamDeckPluginTests.m` with the plugin sources using plain `clang` (Command Line Tools are enough) and drives `MyStreamDeckPlugin` through its event methods; scripts prove they ran by writing a marker file. Add a test function to `Tests/MyStreamDeckPluginTests.m` and list it in `main()`. If you add a source file the plugin depends on, add it to `TEST_SOURCES` in the `Makefile`.
+- The tests do not cover the WebSocket layer (`ESDConnectionManager`) or the Property Inspector. For those, install the plugin in the Stream Deck app and press a key; script errors go to the unified log via `NSLog` (filter Console.app by `OSAScript`).
+- The `OSAScript` binary and the `.streamDeckPlugin` package are never committed (both are in `.gitignore`). A source change ships when a `v*` tag is pushed.
 
 ## Conventions
 
 - Keep the action UUID and plugin folder name `com.gabrielperales.osascript` stable: renaming breaks keys users have already configured.
 - When adding user-visible strings, update both `en.json` and `es.json`.
-- Bump `Version` in `manifest.json` with every new release package.
+- Bump `Version` in `manifest.json` before tagging a release; the workflow fails if the tag (`v1.2.3`) and `Version` (`1.2.3`) differ.
 - Leave `xcuserdata/` files out of commits.
