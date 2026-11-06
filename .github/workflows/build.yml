@@ -27,19 +27,22 @@ jobs:
       - name: Check manifest version matches tag
         if: startsWith(github.ref, 'refs/tags/v')
         run: |
+          # manifest.json uses {major}.{minor}.{patch}.{build}; tags and
+          # CHANGELOG.md use {major}.{minor}.{patch}.
           manifest_version=$(plutil -extract Version raw -o - Sources/com.gabrielperales.osascript.sdPlugin/manifest.json)
-          if [ "v$manifest_version" != "$GITHUB_REF_NAME" ]; then
-            echo "::error::manifest.json Version is $manifest_version but tag is $GITHUB_REF_NAME"
+          release_version=${manifest_version%.*}
+          if [ "v$release_version" != "$GITHUB_REF_NAME" ]; then
+            echo "::error::manifest.json Version is $manifest_version (release $release_version) but tag is $GITHUB_REF_NAME"
             exit 1
           fi
-          awk -v v="$manifest_version" '
+          awk -v v="$release_version" '
             $0 ~ "^## \\[" v "\\]" { found = 1; next }
             found && /^## \[/ { exit }
             found && /^\[[^]]+\]: / { exit }
             found { print }
           ' CHANGELOG.md > build-release-notes.md
           if ! grep -q '[^[:space:]]' build-release-notes.md; then
-            echo "::error::CHANGELOG.md has no section for [$manifest_version]"
+            echo "::error::CHANGELOG.md has no section for [$release_version]"
             exit 1
           fi
 

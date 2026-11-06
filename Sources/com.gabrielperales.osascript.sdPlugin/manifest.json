@@ -6,7 +6,7 @@
       "States": [
         {
           "Image": "OSAScriptIcon",
-          "FontSize": "18",
+          "FontSize": 18,
           "FontStyle": "Bold",
           "TitleAlignment": "middle",
           "TitleColor": "#ffffff"
@@ -16,6 +16,7 @@
       "UUID": "com.gabrielperales.osascript.action"
     }
   ],
+  "UUID": "com.gabrielperales.osascript",
   "SDKVersion": 2,
   "Author": "Gabriel Perales",
 	"CodePath": "OSAScript",
@@ -25,7 +26,7 @@
   "Name": "OSA Script",
   "Category": "OSA Script",
   "Icon": "OSAScriptIcon",
-  "Version": "1.1.0",
+  "Version": "1.1.0.0",
   "OS": [
     {
         "Platform": "mac",
