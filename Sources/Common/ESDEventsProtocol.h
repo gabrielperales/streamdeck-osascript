@@ -31,6 +31,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)willAppearForAction:(NSString *)action withContext:(id)context withPayload:(NSDictionary *)payload forDevice:(NSString *)deviceID;
 - (void)willDisappearForAction:(NSString *)action withContext:(id)context withPayload:(NSDictionary *)payload forDevice:(NSString *)deviceID;
 
+// Sent when the Property Inspector (or the plugin) saves the action's settings.
+- (void)didReceiveSettingsForAction:(NSString *)action withContext:(id)context withPayload:(NSDictionary *)payload forDevice:(NSString *)deviceID;
+
 - (void)deviceDidConnect:(NSString *)deviceID withDeviceInfo:(NSDictionary *)deviceInfo;
 - (void)deviceDidDisconnect:(NSString *)deviceID;
 

@@ -17,10 +17,10 @@ The Property Inspector and the plugin share two per-key settings. Keep both side
 
 | Key | Values | Written by | Read by |
 | --- | --- | --- | --- |
-| `language` | `"AppleScript"` \| `"JavaScript"` (passed to `+[OSALanguage languageForName:]`) | `saveSettings()` in `index.html` | `keyDownForAction:` |
-| `scriptText` | script source | `saveSettings()` in `index.html` | `keyDownForAction:` |
+| `language` | `"AppleScript"` \| `"JavaScript"` (passed to `+[OSALanguage languageForName:]`) | `saveSettings()` in `index.html` | `willAppearForAction:` / `didReceiveSettingsForAction:` (cached), `keyDownForAction:` |
+| `scriptText` | script source | `saveSettings()` in `index.html` | `willAppearForAction:` / `didReceiveSettingsForAction:` (cached), `keyDownForAction:` |
 
-The plugin caches settings in `settingsPayload`, keyed by action context, and fills that cache **only in `willAppearForAction:`**. `didReceiveSettings` is defined in `ESDSDKDefines.h` but not dispatched by `ESDConnectionManager` or handled by the plugin, so Property Inspector edits reach the plugin only after the key reappears. Fixing that means adding the dispatch in `ESDConnectionManager.m`, a method on `ESDEventsProtocol`, and an implementation that refreshes `settingsPayload[context]`.
+The plugin caches settings in `settingsPayload`, keyed by action context, through `storeSettingsFromPayload:forContext:`. It refreshes that cache in `willAppearForAction:` and in `didReceiveSettingsForAction:`, which `ESDConnectionManager` dispatches whenever the Property Inspector saves. Property Inspector edits therefore apply on the next key press. Keep both paths when changing how settings are stored; `Tests/MyStreamDeckPluginTests.m` and `make e2e` cover them.
 
 ## Building and verifying
 

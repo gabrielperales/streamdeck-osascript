@@ -214,6 +214,32 @@ def main():
                   f"app.doShellScript('printf jxa > ' + {json.dumps(jxa_marker)});")
         check(wait_for_file(jxa_marker) == "jxa", "JavaScript (JXA) key runs its script on keyDown")
 
+        # A key dropped from the action list appears with no script; the script
+        # typed in the Property Inspector arrives as didReceiveSettings.
+        edited_marker = os.path.join(tmp, "edited")
+        connection.send_json({
+            "event": "willAppear", "action": action_uuid, "context": "key-edited",
+            "device": "fake-device",
+            "payload": {"settings": {}, "coordinates": {"column": 1, "row": 0},
+                        "state": 0, "isInMultiAction": False},
+        })
+        connection.send_json({
+            "event": "didReceiveSettings", "action": action_uuid, "context": "key-edited",
+            "device": "fake-device",
+            "payload": {"settings": {"language": "AppleScript", "scriptText":
+                        f'do shell script "printf edited > " & quoted form of "{edited_marker}"'},
+                        "coordinates": {"column": 1, "row": 0}, "isInMultiAction": False},
+        })
+        for event in ("keyDown", "keyUp"):
+            connection.send_json({
+                "event": event, "action": action_uuid, "context": "key-edited",
+                "device": "fake-device",
+                "payload": {"settings": {}, "coordinates": {"column": 1, "row": 0},
+                            "state": 0, "isInMultiAction": False},
+            })
+        check(wait_for_file(edited_marker) == "edited",
+              "a script saved in the Property Inspector (didReceiveSettings) runs without the key reappearing")
+
         broken_marker = os.path.join(tmp, "after-error")
         press_key("key-broken", "AppleScript", "this is not valid AppleScript (")
         press_key("key-after-error", "AppleScript",

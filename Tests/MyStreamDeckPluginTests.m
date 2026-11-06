@@ -136,6 +136,65 @@ static void testReappearingReplacesSettings(void)
 	CHECK([ReadMarker(marker) isEqualToString:@"new"], @"marker was %@", ReadMarker(marker));
 }
 
+static void ReceiveSettings(MyStreamDeckPlugin *plugin, NSString *context, NSDictionary *settings)
+{
+	[plugin didReceiveSettingsForAction:kAction withContext:context withPayload:AppearPayload(settings) forDevice:kDevice];
+}
+
+static void testDidReceiveSettingsReplacesSettingsWithoutReappearing(void)
+{
+	// The Property Inspector saves on every edit; Stream Deck then sends
+	// didReceiveSettings. The next press must run the edited script.
+	MyStreamDeckPlugin *plugin = [[MyStreamDeckPlugin alloc] init];
+	NSString *marker = TempMarkerPath();
+
+	Appear(plugin, @"ctx", @{@"language": @"AppleScript", @"scriptText": AppleScriptWriting(@"old", marker)});
+	ReceiveSettings(plugin, @"ctx", @{@"language": @"JavaScript", @"scriptText": JXAWriting(@"new", marker)});
+
+	Press(plugin, @"ctx");
+	CHECK([ReadMarker(marker) isEqualToString:@"new"], @"marker was %@", ReadMarker(marker));
+}
+
+static void testDidReceiveSettingsForNewKeyWithoutScript(void)
+{
+	// A key dropped from the action list appears with empty settings; the
+	// script typed afterwards arrives only through didReceiveSettings.
+	MyStreamDeckPlugin *plugin = [[MyStreamDeckPlugin alloc] init];
+	NSString *marker = TempMarkerPath();
+
+	Appear(plugin, @"ctx", @{});
+	ReceiveSettings(plugin, @"ctx", @{@"language": @"AppleScript", @"scriptText": AppleScriptWriting(@"typed", marker)});
+
+	Press(plugin, @"ctx");
+	CHECK([ReadMarker(marker) isEqualToString:@"typed"], @"marker was %@", ReadMarker(marker));
+}
+
+static void testDidReceiveSettingsOnlyChangesItsKey(void)
+{
+	MyStreamDeckPlugin *plugin = [[MyStreamDeckPlugin alloc] init];
+	NSString *markerA = TempMarkerPath();
+	NSString *markerB = TempMarkerPath();
+
+	Appear(plugin, @"key-a", @{@"language": @"AppleScript", @"scriptText": AppleScriptWriting(@"a", markerA)});
+	Appear(plugin, @"key-b", @{@"language": @"AppleScript", @"scriptText": AppleScriptWriting(@"b", markerB)});
+	ReceiveSettings(plugin, @"key-b", @{@"language": @"AppleScript", @"scriptText": AppleScriptWriting(@"b2", markerB)});
+
+	Press(plugin, @"key-a");
+	CHECK([ReadMarker(markerA) isEqualToString:@"a"], @"key A marker was %@", ReadMarker(markerA));
+	Press(plugin, @"key-b");
+	CHECK([ReadMarker(markerB) isEqualToString:@"b2"], @"key B marker was %@", ReadMarker(markerB));
+}
+
+static void testMissingSettingsDoNotCrash(void)
+{
+	// Payloads without a settings dictionary must be ignored, not crash.
+	MyStreamDeckPlugin *plugin = [[MyStreamDeckPlugin alloc] init];
+	NSDictionary *payload = @{@"coordinates": @{@"column": @0, @"row": @0}};
+	[plugin willAppearForAction:kAction withContext:@"ctx" withPayload:payload forDevice:kDevice];
+	[plugin didReceiveSettingsForAction:kAction withContext:@"ctx" withPayload:payload forDevice:kDevice];
+	Press(plugin, @"ctx");
+}
+
 static void testKeyDownForUnknownContextDoesNothing(void)
 {
 	MyStreamDeckPlugin *plugin = [[MyStreamDeckPlugin alloc] init];
@@ -188,6 +247,10 @@ int main(int argc, const char * argv[])
 			{"testRunsJavaScriptOnKeyDown", testRunsJavaScriptOnKeyDown},
 			{"testEachKeyRunsItsOwnScript", testEachKeyRunsItsOwnScript},
 			{"testReappearingReplacesSettings", testReappearingReplacesSettings},
+			{"testDidReceiveSettingsReplacesSettingsWithoutReappearing", testDidReceiveSettingsReplacesSettingsWithoutReappearing},
+			{"testDidReceiveSettingsForNewKeyWithoutScript", testDidReceiveSettingsForNewKeyWithoutScript},
+			{"testDidReceiveSettingsOnlyChangesItsKey", testDidReceiveSettingsOnlyChangesItsKey},
+			{"testMissingSettingsDoNotCrash", testMissingSettingsDoNotCrash},
 			{"testKeyDownForUnknownContextDoesNothing", testKeyDownForUnknownContextDoesNothing},
 			{"testKeyWithoutScriptDoesNothing", testKeyWithoutScriptDoesNothing},
 			{"testFailingScriptDoesNotStopLaterPresses", testFailingScriptDoesNotStopLaterPresses},

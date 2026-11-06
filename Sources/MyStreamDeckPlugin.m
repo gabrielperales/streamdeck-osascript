@@ -222,14 +222,31 @@ static NSString * CreateBase64EncodedString(NSString *inImagePath)
 	
     NSLog(@"willAppear: %@", payload);
 
-    //create a temp dictionary with the "context" for this 'fake instance' with contents of settings from App
-    NSDictionary * tempSettings = @{context: payload[@"settings"]};
+    [self storeSettingsFromPayload:payload forContext:context];
 
-    //add that temp dictionary to our internal not-a-database
-    [self.settingsPayload addEntriesFromDictionary:tempSettings];
-    
 	// Add the context to the list of known contexts
 	[self.knownContexts addObject:context];
+}
+
+- (void)didReceiveSettingsForAction:(NSString *)action withContext:(id)context withPayload:(NSDictionary *)payload forDevice:(NSString *)deviceID
+{
+	[self setupIfNeeded];
+
+	NSLog(@"didReceiveSettings: %@", payload);
+
+	// The Property Inspector saved new settings for this key: use them on the next press.
+	[self storeSettingsFromPayload:payload forContext:context];
+}
+
+// Keeps our copy of a key's settings (language, scriptText), keyed by its context.
+- (void)storeSettingsFromPayload:(NSDictionary *)payload forContext:(id)context
+{
+	NSDictionary *settings = payload[@"settings"];
+	if(context == nil || ![settings isKindOfClass:[NSDictionary class]])
+	{
+		return;
+	}
+	self.settingsPayload[context] = settings;
 }
 
 - (void)willDisappearForAction:(NSString *)action withContext:(id)context withPayload:(NSDictionary *)payload forDevice:(NSString *)deviceID

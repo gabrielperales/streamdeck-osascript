@@ -18,6 +18,10 @@ All notable changes to this plugin are documented here. The format is based on [
 - Every release package is now validated and packed with Elgato's Stream Deck CLI.
 - New high-resolution plugin icon (256 × 256 and 512 × 512 px) and a category icon.
 
+### Fixed
+
+- Script edits in the Property Inspector apply on the next key press. Before, they only took effect after the key reappeared (changing page or profile, or restarting Stream Deck).
+
 ### Removed
 
 - The prebuilt plugin is no longer stored in the repository under `Release/`.

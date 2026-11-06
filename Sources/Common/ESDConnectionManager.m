@@ -353,6 +353,13 @@
 				[self.delegate willDisappearForAction:action withContext:context withPayload:payload forDevice:deviceID];
 	 		}
 	 	}
+	 	else if([event isEqualToString:@kESDSDKEventDidReceiveSettings])
+	 	{
+			if([self.delegate respondsToSelector:@selector(didReceiveSettingsForAction:withContext:withPayload:forDevice:)])
+	 		{
+				[self.delegate didReceiveSettingsForAction:action withContext:context withPayload:payload forDevice:deviceID];
+	 		}
+	 	}
 	 	else if([event isEqualToString:@kESDSDKEventDeviceDidConnect])
 	 	{
 			if([self.delegate respondsToSelector:@selector(deviceDidConnect:withDeviceInfo:)])
