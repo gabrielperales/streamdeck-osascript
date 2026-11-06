@@ -15,7 +15,7 @@ Run AppleScript and JavaScript for Automation (JXA) from a Stream Deck key.
 ## Requirements
 
 - macOS 10.13 or later
-- Stream Deck software 4.1 or later
+- Stream Deck software 6.4 or later
 
 ## Installation
 

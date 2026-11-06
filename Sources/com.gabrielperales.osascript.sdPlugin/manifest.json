@@ -23,6 +23,7 @@
   "Description": "Run AppleScript / JavaScript code",
   "URL": "https://github.com/gabrielperales/streamdeck-osascript",
   "Name": "OSA Script",
+  "Category": "OSA Script",
   "Icon": "OSAScriptIcon",
   "Version": "1.1.0",
   "OS": [
@@ -33,6 +34,6 @@
   ],
   "Software":
     {
-        "MinimumVersion" : "4.1"
+        "MinimumVersion" : "6.4"
     }
 }
