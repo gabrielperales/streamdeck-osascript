@@ -1,7 +1,8 @@
 # `make test` builds and runs the plugin tests with clang (Command Line Tools
-# are enough). `make package` needs Xcode: it runs the tests, builds a
-# universal OSAScript binary and zips it with the .sdPlugin folder into
-# build/release/. `build` depends on `test`, so a failing test stops the build.
+# are enough). `make package` needs Xcode and Node.js 20+: it runs the tests,
+# builds a universal OSAScript binary, then validates and packs the .sdPlugin
+# folder with Elgato's CLI into build/release/. Each step depends on the one
+# before it, so a failing test or validation stops the package.
 
 BUILD_DIR := build/tests
 CFLAGS := -fobjc-arc -fmodules -Wall -Wno-deprecated-declarations \
@@ -12,13 +13,16 @@ TEST_SOURCES := Tests/MyStreamDeckPluginTests.m \
                 Sources/MyStreamDeckPlugin.m \
                 Sources/Common/ESDUtilities.m
 
-.PHONY: test build package clean
+.PHONY: test build stage validate package clean
 
 PLUGIN := com.gabrielperales.osascript
 XCODE_DIR := build/xcode
 STAGE_DIR := build/stage
 RELEASE_DIR := build/release
 PACKAGE := $(RELEASE_DIR)/$(PLUGIN).streamDeckPlugin
+# Elgato's Stream Deck CLI validates and packs the plugin (needs Node.js 20+).
+STREAMDECK_CLI_VERSION := 1.10.4
+STREAMDECK := npx --yes @elgato/cli@$(STREAMDECK_CLI_VERSION)
 
 test: $(BUILD_DIR)/PluginTests
 	$(BUILD_DIR)/PluginTests
@@ -33,12 +37,20 @@ build: test
 	  ARCHS="arm64 x86_64" ONLY_ACTIVE_ARCH=NO \
 	  build
 
-package: build
-	rm -rf $(STAGE_DIR) $(PACKAGE)
-	mkdir -p $(STAGE_DIR) $(RELEASE_DIR)
-	cp -R Sources/$(PLUGIN).sdPlugin $(STAGE_DIR)/
+stage: build
+	rm -rf $(STAGE_DIR)
+	mkdir -p $(STAGE_DIR)
+	rsync -a --exclude .DS_Store Sources/$(PLUGIN).sdPlugin $(STAGE_DIR)/
 	cp $(XCODE_DIR)/Build/Products/Release/OSAScript $(STAGE_DIR)/$(PLUGIN).sdPlugin/
-	cd $(STAGE_DIR) && zip -r -X ../../$(PACKAGE) $(PLUGIN).sdPlugin -x '*.DS_Store'
+
+validate: stage
+	$(STREAMDECK) validate $(STAGE_DIR)/$(PLUGIN).sdPlugin --no-update-check
+
+package: validate
+	rm -f $(PACKAGE)
+	mkdir -p $(RELEASE_DIR)
+	$(STREAMDECK) pack $(STAGE_DIR)/$(PLUGIN).sdPlugin --output $(RELEASE_DIR) --force --no-update-check
+	@test -f $(PACKAGE) || { echo "streamdeck pack did not produce $(PACKAGE)"; ls -l $(RELEASE_DIR); exit 1; }
 	@echo "Built $(PACKAGE)"
 
 clean:

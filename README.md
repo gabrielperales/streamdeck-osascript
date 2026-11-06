@@ -86,16 +86,16 @@ The plugin source lives in [`Sources/`](Sources/):
 | `Sources/Vendor/SocketRocket/` | Vendored WebSocket library |
 | `Sources/com.gabrielperales.osascript.sdPlugin/` | Plugin bundle: `manifest.json`, Property Inspector (`index.html`) and icons. The `OSAScript` binary is added at build time |
 
-To build and package (requires Xcode):
+To build and package (requires Xcode and Node.js 20+):
 
 ```sh
 make test      # unit tests (Command Line Tools are enough)
-make package   # universal binary + build/release/com.gabrielperales.osascript.streamDeckPlugin
+make package   # tests, universal binary, `streamdeck validate`, `streamdeck pack`
 ```
 
-`make package` always runs the tests first and stops if any fail.
+`make package` stops at the first failing step: tests, build, or Elgato's validation. The package is written to `build/release/com.gabrielperales.osascript.streamDeckPlugin`.
 
-GitHub Actions runs two workflows. **Tests** (`.github/workflows/test.yml`) runs `make test` on every pull request. **Build** (`.github/workflows/build.yml`) runs on pushes to `master` and on `v*` tags: it runs the Tests workflow first, builds and packages only if the tests pass, and uploads the package as a workflow artifact. To publish a release, bump `Version` in `manifest.json`, add a matching section to [`CHANGELOG.md`](CHANGELOG.md) (it becomes the release notes), then push a matching tag (for example `v1.1.0`); the workflow attaches the package to a GitHub release.
+GitHub Actions runs the **Build** workflow (`.github/workflows/build.yml`) on pull requests, pushes to `master` and `v*` tags. It calls the reusable **Tests** workflow (`.github/workflows/test.yml`) first, then builds, validates and packages only if the tests pass, and uploads the package as a workflow artifact. To publish a release, bump `Version` in `manifest.json`, add a matching section to [`CHANGELOG.md`](CHANGELOG.md) (it becomes the release notes), then push a matching tag (for example `v1.1.0`); the workflow attaches the package to a GitHub release.
 
 ## Resources to learn AppleScript and JXA
 
