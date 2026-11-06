@@ -1,0 +1,6 @@
+build/
+
+# Build outputs: produced by `make package` / GitHub Actions, not committed
+Sources/com.gabrielperales.osascript.sdPlugin/OSAScript
+Release/
+__pycache__/

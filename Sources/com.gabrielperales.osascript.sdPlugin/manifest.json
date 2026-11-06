@@ -6,7 +6,7 @@
       "States": [
         {
           "Image": "OSAScriptIcon",
-          "FontSize": "18",
+          "FontSize": 18,
           "FontStyle": "Bold",
           "TitleAlignment": "middle",
           "TitleColor": "#ffffff"
@@ -16,6 +16,7 @@
       "UUID": "com.gabrielperales.osascript.action"
     }
   ],
+  "UUID": "com.gabrielperales.osascript",
   "SDKVersion": 2,
   "Author": "Gabriel Perales",
 	"CodePath": "OSAScript",
@@ -23,16 +24,18 @@
   "Description": "Run AppleScript / JavaScript code",
   "URL": "https://github.com/gabrielperales/streamdeck-osascript",
   "Name": "OSA Script",
-  "Icon": "OSAScriptIcon",
-  "Version": "1.0.0",
+  "Category": "OSA Script",
+  "CategoryIcon": "categoryIcon",
+  "Icon": "pluginIcon",
+  "Version": "1.1.0.0",
   "OS": [
     {
         "Platform": "mac",
-        "MinimumVersion" : "10.11"
+        "MinimumVersion" : "10.13"
     }
   ],
   "Software":
     {
-        "MinimumVersion" : "4.1"
+        "MinimumVersion" : "6.4"
     }
 }

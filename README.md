@@ -1,5 +1,9 @@
 # streamdeck-osascript
 
+[![Build](https://github.com/gabrielperales/streamdeck-osascript/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/gabrielperales/streamdeck-osascript/actions/workflows/build.yml?query=branch%3Amaster)
+[![Latest release](https://img.shields.io/github/v/release/gabrielperales/streamdeck-osascript)](https://github.com/gabrielperales/streamdeck-osascript/releases/latest)
+[![License: MIT](https://img.shields.io/github/license/gabrielperales/streamdeck-osascript)](LICENSE)
+
 Run AppleScript and JavaScript for Automation (JXA) from a Stream Deck key.
 
 ![Property Inspector of the OSA Script action](screenshot.png)
@@ -10,16 +14,18 @@ Run AppleScript and JavaScript for Automation (JXA) from a Stream Deck key.
 
 - Runs **AppleScript** or **JXA** (JavaScript for Automation) on key press
 - Scripts are written inline in the Property Inspector, one per key
+- Edits in the Property Inspector apply on the next key press
 - Native Objective-C plugin using `OSAKit`, so there is no `osascript` subprocess
+- Universal binary: runs natively on Apple silicon and Intel Macs
 
 ## Requirements
 
-- macOS 10.11 or later
-- Stream Deck software 4.1 or later
+- macOS 10.13 or later
+- Stream Deck software 6.4 or later
 
 ## Installation
 
-1. Download [`Release/com.gabrielperales.osascript.streamDeckPlugin`](Release/com.gabrielperales.osascript.streamDeckPlugin).
+1. Download `com.gabrielperales.osascript.streamDeckPlugin` from the [latest release](https://github.com/gabrielperales/streamdeck-osascript/releases/latest).
 2. Double-click it. The Stream Deck app installs the plugin.
 3. Drag the **Run OSA script** action (category **OSA Script**) onto a key.
 
@@ -28,10 +34,7 @@ Run AppleScript and JavaScript for Automation (JXA) from a Stream Deck key.
 1. Select the key to open its Property Inspector.
 2. Pick the **Script Language**: `AppleScript` or `JavaScript`.
 3. Paste your script into **Script (Inline)**. It is saved as you type.
-4. Press the key.
-
-> [!NOTE]
-> The plugin reads a key's script when the key appears on the Stream Deck. After editing a script, switch to another page or profile and back (or restart the Stream Deck app) before pressing the key.
+4. Press the key. It runs the script as currently saved; there is no need to switch pages or restart Stream Deck after editing.
 
 The first time a script controls another app, macOS asks for permission. You can review it later under **System Settings → Privacy & Security → Automation** (and **Accessibility** for scripts that use `System Events` to click or type).
 
@@ -60,18 +63,25 @@ end tell
 tell application "Music" to playpause
 ```
 
-### Show a notification (JXA)
+### Speak text (AppleScript)
+
+```applescript
+say "Hello from Stream Deck"
+```
+
+### Open a web page in the default browser (JXA)
 
 ```javascript
 var app = Application.currentApplication();
 app.includeStandardAdditions = true;
-app.displayNotification('Hello from Stream Deck', { withTitle: 'OSA Script' });
+app.openLocation('https://github.com/gabrielperales/streamdeck-osascript');
 ```
 
 ## Troubleshooting
 
 - **Nothing happens when I press the key.** Test the script in Script Editor (or with `osascript` in Terminal) first. Script errors are written to the macOS log; open Console.app and filter by `OSAScript`.
-- **My edits are ignored.** See the note in [Usage](#usage): the key has to reappear before the new script is picked up.
+- **My edits are ignored.** Update to version 1.1.0 or later. Earlier versions only picked up an edited script after the key reappeared (changing page or profile, or restarting the Stream Deck app).
+- **`display notification` shows nothing.** macOS does not show notifications posted from the plugin process, so `display notification` (AppleScript) and `displayNotification` (JXA) do nothing when run from a key. Use another visible action instead, such as `say`, or open an app or URL.
 - **"Not authorized to send Apple events".** Grant permission under **Privacy & Security → Automation**.
 
 ## Building from source
@@ -84,13 +94,22 @@ The plugin source lives in [`Sources/`](Sources/):
 | `Sources/MyStreamDeckPlugin.m` | Plugin logic: stores settings per key and runs the script on key down |
 | `Sources/Common/` | Elgato SDK connection boilerplate |
 | `Sources/Vendor/SocketRocket/` | Vendored WebSocket library |
-| `Sources/com.gabrielperales.osascript.sdPlugin/` | Plugin bundle: `manifest.json`, Property Inspector (`index.html`), icons, and the compiled `OSAScript` binary |
+| `Sources/com.gabrielperales.osascript.sdPlugin/` | Plugin bundle: `manifest.json`, Property Inspector (`index.html`) and icons. The `OSAScript` binary is added at build time |
 
-To build and package:
+To build and package (requires Xcode and Node.js 20+):
 
-1. Open `Sources/OSAScript.xcodeproj` in Xcode and build the `RunOSAScript` scheme.
-2. Copy the built `OSAScript` executable into `Sources/com.gabrielperales.osascript.sdPlugin/`.
-3. Package the `.sdPlugin` folder with Elgato's packaging tool (the [Stream Deck CLI](https://docs.elgato.com/streamdeck/cli/intro) `streamdeck pack` command, or the older `DistributionTool`) and place the resulting `.streamDeckPlugin` in `Release/`.
+```sh
+make test      # unit tests (Command Line Tools are enough)
+make package   # test, build, stage, validate, pack and e2e, in that order
+```
+
+`make e2e` tests the packaged plugin without a Stream Deck: `Tests/fake_streamdeck.py` plays the Stream Deck app, launches the real binary (arm64 and x86_64), presses keys configured with AppleScript and JXA scripts, and checks that a script edited in the Property Inspector runs on the next press. Nothing automated covers the Property Inspector UI (`index.html`); test that in the Stream Deck app.
+
+`make validate` runs `Tests/check_manifest.py` before Elgato's validator. It catches manifest problems the Stream Deck app rejects on install but `streamdeck validate` misses, such as a `Category` without a `CategoryIcon`.
+
+Each step is also its own target (`make build`, `make stage`, `make validate`, `make pack`, `make e2e`). `make package` stops at the first failing step. The package is written to `build/release/com.gabrielperales.osascript.streamDeckPlugin`.
+
+GitHub Actions runs the **Build** workflow (`.github/workflows/build.yml`) on pull requests, pushes to `master` and `v*` tags. It calls the reusable **Tests** workflow (`.github/workflows/test.yml`) first. Only if the tests pass does it run build, stage, validate, pack and the end-to-end test as separate steps, and uploads the package as a workflow artifact. To publish a release, bump `Version` in `manifest.json` (four parts, for example `1.1.0.0`), add a matching section to [`CHANGELOG.md`](CHANGELOG.md) (it becomes the release notes), then push a matching tag (for example `v1.1.0`); the workflow attaches the package to a GitHub release.
 
 ## Resources to learn AppleScript and JXA
 
