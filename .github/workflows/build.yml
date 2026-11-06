@@ -27,6 +27,16 @@ jobs:
             echo "::error::manifest.json Version is $manifest_version but tag is $GITHUB_REF_NAME"
             exit 1
           fi
+          awk -v v="$manifest_version" '
+            $0 ~ "^## \\[" v "\\]" { found = 1; next }
+            found && /^## \[/ { exit }
+            found && /^\[[^]]+\]: / { exit }
+            found { print }
+          ' CHANGELOG.md > build-release-notes.md
+          if ! grep -q '[^[:space:]]' build-release-notes.md; then
+            echo "::error::CHANGELOG.md has no section for [$manifest_version]"
+            exit 1
+          fi
 
       - name: Build and package
         run: make package
@@ -43,4 +53,4 @@ jobs:
         run: |
           gh release create "$GITHUB_REF_NAME" \
             build/release/com.gabrielperales.osascript.streamDeckPlugin \
-            --title "$GITHUB_REF_NAME" --generate-notes
+            --title "$GITHUB_REF_NAME" --notes-file build-release-notes.md

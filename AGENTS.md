@@ -33,4 +33,5 @@ The plugin caches settings in `settingsPayload`, keyed by action context, and fi
 - Keep the action UUID and plugin folder name `com.gabrielperales.osascript` stable: renaming breaks keys users have already configured.
 - When adding user-visible strings, update both `en.json` and `es.json`.
 - Bump `Version` in `manifest.json` before tagging a release; the workflow fails if the tag (`v1.2.3`) and `Version` (`1.2.3`) differ.
+- Add user-visible changes under `## [Unreleased]` in `CHANGELOG.md`. When releasing, rename that section to the new version and date. The workflow uses that section as the GitHub release notes and fails if it is missing.
 - Leave `xcuserdata/` files out of commits.

@@ -93,7 +93,7 @@ make test      # unit tests (Command Line Tools are enough)
 make package   # universal binary + build/release/com.gabrielperales.osascript.streamDeckPlugin
 ```
 
-GitHub Actions (`.github/workflows/build.yml`) runs the same steps on every push and pull request and uploads the package as a workflow artifact. To publish a release, bump `Version` in `manifest.json`, then push a matching tag (for example `v1.1.0`); the workflow attaches the package to a GitHub release.
+GitHub Actions (`.github/workflows/build.yml`) runs the same steps on every push and pull request and uploads the package as a workflow artifact. To publish a release, bump `Version` in `manifest.json`, add a matching section to [`CHANGELOG.md`](CHANGELOG.md) (it becomes the release notes), then push a matching tag (for example `v1.1.0`); the workflow attaches the package to a GitHub release.
 
 ## Resources to learn AppleScript and JXA
 
