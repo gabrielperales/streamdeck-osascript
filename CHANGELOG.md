@@ -16,6 +16,7 @@ All notable changes to this plugin are documented here. The format is based on [
 - Minimum macOS version raised from 10.11 to 10.13.
 - Minimum Stream Deck software version raised from 4.1 to 6.4, the oldest version Elgato's validation accepts.
 - Every release package is now validated and packed with Elgato's Stream Deck CLI.
+- New high-resolution plugin icon (256 × 256 and 512 × 512 px).
 
 ### Removed
 
