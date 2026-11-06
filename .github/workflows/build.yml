@@ -58,6 +58,9 @@ jobs:
       - name: Pack
         run: make pack
 
+      - name: End-to-end test (fake Stream Deck)
+        run: make e2e
+
       - uses: actions/upload-artifact@v7
         with:
           name: com.gabrielperales.osascript.streamDeckPlugin

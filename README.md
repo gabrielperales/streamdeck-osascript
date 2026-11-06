@@ -90,12 +90,14 @@ To build and package (requires Xcode and Node.js 20+):
 
 ```sh
 make test      # unit tests (Command Line Tools are enough)
-make package   # test, build, stage, validate and pack, in that order
+make package   # test, build, stage, validate, pack and e2e, in that order
 ```
 
-Each step is also its own target (`make build`, `make stage`, `make validate`, `make pack`). `make package` stops at the first failing step. The package is written to `build/release/com.gabrielperales.osascript.streamDeckPlugin`.
+`make e2e` tests the packaged plugin without a Stream Deck: `Tests/fake_streamdeck.py` plays the Stream Deck app, launches the real binary (arm64 and x86_64) and presses keys configured with AppleScript and JXA scripts.
 
-GitHub Actions runs the **Build** workflow (`.github/workflows/build.yml`) on pull requests, pushes to `master` and `v*` tags. It calls the reusable **Tests** workflow (`.github/workflows/test.yml`) first. Only if the tests pass does it run build, stage, validate and pack as separate steps, and uploads the package as a workflow artifact. To publish a release, bump `Version` in `manifest.json` (four parts, for example `1.1.0.0`), add a matching section to [`CHANGELOG.md`](CHANGELOG.md) (it becomes the release notes), then push a matching tag (for example `v1.1.0`); the workflow attaches the package to a GitHub release.
+Each step is also its own target (`make build`, `make stage`, `make validate`, `make pack`, `make e2e`). `make package` stops at the first failing step. The package is written to `build/release/com.gabrielperales.osascript.streamDeckPlugin`.
+
+GitHub Actions runs the **Build** workflow (`.github/workflows/build.yml`) on pull requests, pushes to `master` and `v*` tags. It calls the reusable **Tests** workflow (`.github/workflows/test.yml`) first. Only if the tests pass does it run build, stage, validate, pack and the end-to-end test as separate steps, and uploads the package as a workflow artifact. To publish a release, bump `Version` in `manifest.json` (four parts, for example `1.1.0.0`), add a matching section to [`CHANGELOG.md`](CHANGELOG.md) (it becomes the release notes), then push a matching tag (for example `v1.1.0`); the workflow attaches the package to a GitHub release.
 
 ## Resources to learn AppleScript and JXA
 

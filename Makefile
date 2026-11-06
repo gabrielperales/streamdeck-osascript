@@ -4,6 +4,8 @@
 #   stage     copy the .sdPlugin folder and the binary into build/stage/
 #   validate  run Elgato's `streamdeck validate` on the staged plugin (needs Node.js 20+)
 #   pack      run `streamdeck pack` into build/release/
+#   e2e       unpack the package and drive the real binary with a fake Stream Deck
+#             (Tests/fake_streamdeck.py), once per architecture in E2E_ARCHS
 # `make package` runs all of them in that order and stops at the first failure.
 
 BUILD_DIR := build/tests
@@ -15,7 +17,7 @@ TEST_SOURCES := Tests/MyStreamDeckPluginTests.m \
                 Sources/MyStreamDeckPlugin.m \
                 Sources/Common/ESDUtilities.m
 
-.PHONY: test build stage validate pack package clean
+.PHONY: test build stage validate pack e2e package clean
 
 PLUGIN := com.gabrielperales.osascript
 XCODE_DIR := build/xcode
@@ -23,6 +25,9 @@ STAGE_DIR := build/stage
 RELEASE_DIR := build/release
 PACKAGE := $(RELEASE_DIR)/$(PLUGIN).streamDeckPlugin
 BINARY := $(XCODE_DIR)/Build/Products/Release/OSAScript
+E2E_DIR := build/e2e
+# x86_64 runs under Rosetta on Apple silicon.
+E2E_ARCHS := arm64 x86_64
 # Elgato's Stream Deck CLI validates and packs the plugin (needs Node.js 20+).
 STREAMDECK_CLI_VERSION := 1.10.4
 STREAMDECK := npx --yes @elgato/cli@$(STREAMDECK_CLI_VERSION)
@@ -59,6 +64,16 @@ pack:
 	@test -f $(PACKAGE) || { echo "streamdeck pack did not produce $(PACKAGE)"; ls -l $(RELEASE_DIR); exit 1; }
 	@echo "Built $(PACKAGE)"
 
+e2e:
+	@test -f $(PACKAGE) || { echo "$(PACKAGE) not found: run 'make pack' first"; exit 1; }
+	rm -rf $(E2E_DIR)
+	mkdir -p $(E2E_DIR)
+	unzip -q $(PACKAGE) -d $(E2E_DIR)
+	for arch in $(E2E_ARCHS); do \
+	  echo "== $$arch"; \
+	  python3 Tests/fake_streamdeck.py --arch $$arch $(E2E_DIR)/$(PLUGIN).sdPlugin || exit 1; \
+	done
+
 # Runs every step in order and stops at the first failure. CI runs the same
 # targets as separate steps.
 package:
@@ -67,6 +82,7 @@ package:
 	$(MAKE) stage
 	$(MAKE) validate
 	$(MAKE) pack
+	$(MAKE) e2e
 
 clean:
 	rm -rf build
