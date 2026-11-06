@@ -28,7 +28,7 @@
   "OS": [
     {
         "Platform": "mac",
-        "MinimumVersion" : "10.11"
+        "MinimumVersion" : "12.0"
     }
   ],
   "Software":
