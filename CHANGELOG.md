@@ -4,6 +4,12 @@ All notable changes to this plugin are documented here. The format is based on [
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-11-07
+
+### Changed
+
+- Minimum Stream Deck software version raised from 6.4 to 6.9, and the manifest now declares Stream Deck SDK version 3. The Elgato Marketplace requires both for plugin updates.
+
 ## [1.1.0] - 2026-11-07
 
 ### Added
@@ -34,6 +40,7 @@ All notable changes to this plugin are documented here. The format is based on [
 
 - First release: run an AppleScript or JavaScript (JXA) script when a Stream Deck key is pressed. The script and language are set per key in the Property Inspector.
 
-[Unreleased]: https://github.com/gabrielperales/streamdeck-osascript/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/gabrielperales/streamdeck-osascript/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/gabrielperales/streamdeck-osascript/releases/tag/v1.2.0
 [1.1.0]: https://github.com/gabrielperales/streamdeck-osascript/releases/tag/v1.1.0
 [1.0.0]: https://github.com/gabrielperales/streamdeck-osascript/tree/ed1b300

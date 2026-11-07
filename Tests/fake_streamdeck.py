@@ -162,7 +162,7 @@ def main():
     port = server.getsockname()[1]
 
     info = {
-        "application": {"language": "en", "platform": "mac", "version": "6.4.0"},
+        "application": {"language": "en", "platform": "mac", "version": "6.9.0"},
         "devices": [{"id": "fake-device", "type": 0, "size": {"columns": 5, "rows": 3}}],
     }
     launcher = ["arch", f"-{arch}"] if arch else []
