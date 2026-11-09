@@ -24,15 +24,37 @@ jobs:
         with:
           node-version: 24
 
-      - name: Check manifest version matches tag
-        if: startsWith(github.ref, 'refs/tags/v')
+      - name: Decide whether to release
+        id: release
         run: |
           # manifest.json uses {major}.{minor}.{patch}.{build}; tags and
           # CHANGELOG.md use {major}.{minor}.{patch}.
           manifest_version=$(plutil -extract Version raw -o - Sources/com.gabrielperales.osascript.sdPlugin/manifest.json)
-          release_version=${manifest_version%.*}
-          if [ "v$release_version" != "$GITHUB_REF_NAME" ]; then
-            echo "::error::manifest.json Version is $manifest_version (release $release_version) but tag is $GITHUB_REF_NAME"
+          manifest_release=${manifest_version%.*}
+          case "$GITHUB_REF" in
+            refs/tags/v*)
+              # A tag pushed by hand: release that version.
+              release_version=${GITHUB_REF_NAME#v}
+              ;;
+            refs/heads/master)
+              # A push to master: release the newest CHANGELOG.md version
+              # if it has no tag yet.
+              release_version=$(sed -n 's/^## \[\([0-9][0-9.]*\)\].*/\1/p' CHANGELOG.md | head -n 1)
+              if [ -z "$release_version" ]; then
+                echo "No released version in CHANGELOG.md; nothing to release."
+                exit 0
+              fi
+              if [ -n "$(git ls-remote --tags origin "refs/tags/v$release_version")" ]; then
+                echo "v$release_version is already tagged; nothing to release."
+                exit 0
+              fi
+              ;;
+            *)
+              exit 0
+              ;;
+          esac
+          if [ "$manifest_release" != "$release_version" ]; then
+            echo "::error::manifest.json Version is $manifest_version (release $manifest_release) but the release is v$release_version"
             exit 1
           fi
           awk -v v="$release_version" '
@@ -45,6 +67,8 @@ jobs:
             echo "::error::CHANGELOG.md has no section for [$release_version]"
             exit 1
           fi
+          echo "Releasing v$release_version."
+          echo "tag=v$release_version" >> "$GITHUB_OUTPUT"
 
       - name: Build
         run: make build
@@ -67,10 +91,20 @@ jobs:
           path: build/release/com.gabrielperales.osascript.streamDeckPlugin
 
       - name: Publish GitHub release
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: steps.release.outputs.tag != ''
         env:
           GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.release.outputs.tag }}
         run: |
-          gh release create "$GITHUB_REF_NAME" \
+          # On master the tag does not exist yet. A tag pushed with
+          # GITHUB_TOKEN does not start another workflow run, so this run
+          # publishes the package it has just built and tested.
+          if [ "$GITHUB_REF" != "refs/tags/$TAG" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git tag -a "$TAG" -m "Release ${TAG#v}" "$GITHUB_SHA"
+            git push origin "$TAG"
+          fi
+          gh release create "$TAG" \
             build/release/com.gabrielperales.osascript.streamDeckPlugin \
-            --title "$GITHUB_REF_NAME" --notes-file build-release-notes.md
+            --verify-tag --title "$TAG" --notes-file build-release-notes.md

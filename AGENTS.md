@@ -9,7 +9,7 @@ macOS Stream Deck plugin (SDK v2, Objective-C) that runs a per-key AppleScript o
 - `Sources/Common/`: Elgato SDK boilerplate (`ESDConnectionManager` dispatches WebSocket events to the plugin).
 - `Sources/Vendor/SocketRocket/`: third-party code. Treat as read-only.
 - `.github/workflows/test.yml`: reusable workflow (`workflow_call`) that runs `make test`. It has no push or PR trigger of its own, so the tests run once per event.
-- `.github/workflows/build.yml`: runs on pull requests, pushes to `master` and `v*` tags. Its `build` job `needs` the Tests workflow, then runs `make build`, `make stage`, `make validate`, `make pack` and `make e2e` as separate steps. On a `v*` tag it also publishes the package as a GitHub release. Keep that `needs: test` dependency, and keep the step order in both places: the `package` target in the `Makefile` and the steps in `build.yml`. Nothing should be packed without passing the tests and Elgato's validation.
+- `.github/workflows/build.yml`: runs on pull requests, pushes to `master` and `v*` tags. Its `build` job `needs` the Tests workflow, then runs `make build`, `make stage`, `make validate`, `make pack` and `make e2e` as separate steps. It publishes the package as a GitHub release on a `v*` tag, or on a push to `master` when the newest version in `CHANGELOG.md` has no tag yet. In that case the same run creates the annotated tag after every step has passed (a tag pushed with `GITHUB_TOKEN` does not start another workflow run). Keep that `needs: test` dependency, and keep the step order in both places: the `package` target in the `Makefile` and the steps in `build.yml`. Nothing should be packed without passing the tests and Elgato's validation.
 
 ## Settings contract
 
@@ -28,13 +28,13 @@ The plugin caches settings in `settingsPayload`, keyed by action context, throug
 - Run `make test` after changing plugin logic. It compiles `Tests/MyStreamDeckPluginTests.m` with the plugin sources using plain `clang` (Command Line Tools are enough) and drives `MyStreamDeckPlugin` through its event methods; scripts prove they ran by writing a marker file. Add a test function to `Tests/MyStreamDeckPluginTests.m` and list it in `main()`. If you add a source file the plugin depends on, add it to `TEST_SOURCES` in the `Makefile`.
 - `make e2e` (`Tests/fake_streamdeck.py`, Python standard library only) plays the Stream Deck app: it unpacks the built package, launches the real binary with Stream Deck's launch arguments, serves the WebSocket and sends `willAppear`/`keyDown`, for both `arm64` and `x86_64` (Rosetta). It covers the compiled binary and `ESDConnectionManager`. Add a check there when changing launch, registration or event handling. The `.streamDeckPlugin` zip does not keep the executable bit; the Stream Deck app sets it on install, and the harness does the same.
 - Nothing automated covers the Property Inspector (`index.html`). For that, install the plugin in the Stream Deck app; script errors go to the unified log via `NSLog` (filter Console.app by `OSAScript`).
-- The `OSAScript` binary and the `.streamDeckPlugin` package are never committed (both are in `.gitignore`). A source change ships when a `v*` tag is pushed.
+- The `OSAScript` binary and the `.streamDeckPlugin` package are never committed (both are in `.gitignore`). A source change ships when a new version section in `CHANGELOG.md` reaches `master`, or when a `v*` tag is pushed.
 
 ## Conventions
 
 - Keep the action UUID and plugin folder name `com.gabrielperales.osascript` stable: renaming breaks keys users have already configured.
 - When adding user-visible strings, update both `en.json` and `es.json`.
-- Bump `Version` in `manifest.json` before tagging a release. Elgato's validator requires four parts (`1.2.3.0`); the tag and the `CHANGELOG.md` section use the first three (`v1.2.3`, `[1.2.3]`). The workflow fails if they differ.
+- Bump `Version` in `manifest.json` in the same change that adds the release's `CHANGELOG.md` section. Elgato's validator requires four parts (`1.2.3.0`); the tag and the `CHANGELOG.md` section use the first three (`v1.2.3`, `[1.2.3]`). The workflow fails if they differ.
 - `manifest.json` must pass `make validate`. It runs `Tests/check_manifest.py` first, which covers install-time rules `streamdeck validate` misses: every referenced icon exists, and `Category` requires `CategoryIcon` (without it the Stream Deck app refuses to install the plugin). Elgato's validator reports errors in stages: fixing one can reveal more, so re-run it until it is clean.
 - Add user-visible changes under `## [Unreleased]` in `CHANGELOG.md`. When releasing, rename that section to the new version and date. The workflow uses that section as the GitHub release notes and fails if it is missing.
 - Leave `xcuserdata/` files out of commits.
